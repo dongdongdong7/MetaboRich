@@ -174,9 +174,7 @@ plot_compareRes(enrichmentResList = list(ora = enrichmentRes_ora, kstest = enric
 plot_compareRes(enrichmentResList = list(ora = enrichmentRes_ora, kstest = enrichmentRes_kstest, grsa = enrichmentRes_grsa), plot_type = 2)
 ```
 
-<div style="position: relative;">
-<iframe style="position: absolute;" src="./assets/compareRes.html" frameborder="1" scrolling="yes" width="320" height="600"</iframe>
-</div>
+<img src="D:\fudan\Projects\2024\meaWmrn\Progress\build_package\MetaboRich\assets\image-20240407163053474.png" alt="image-20240407163053474" style="zoom:50%;" />
 
 
 
