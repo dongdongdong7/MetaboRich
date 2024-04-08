@@ -18,10 +18,14 @@
 #' example_data <- id_mapping(input = example_data, from = "kegg_id", to = "hmdb_id", metabolites_tibble = metabolitesList$hmdb)
 id_mapping <- function(input, from = "kegg_id", to = "hmdb_id", metabolites_tibble){
   input <- dplyr::as_tibble(input)
+  n_start <- nrow(input)
   input <- dplyr::left_join(input, metabolites_tibble, by = c("id" = from))
   input <- input[, c(to, "logfc", "pvalue", "qvalue")]
   colnames(input)[1] <- "id"
   input <- input %>% dplyr::filter(!is.na(id))
+  n_end <- nrow(input)
+  mappingRatio <- paste0(round((n_end / n_start) * 100, 2), "%")
+  message(paste0("mappingRatio: ", mappingRatio))
   return(input)
 }
 
