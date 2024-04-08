@@ -8,7 +8,7 @@ plot_enrichmentRes(
   enrichmentRes,
   top = 10,
   plot_type = 1,
-  legend.position = "none"
+  legend.position = "right"
 )
 }
 \arguments{
