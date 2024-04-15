@@ -1,7 +1,7 @@
 Package: MetaboRich
 Type: Package
 Title: Metabolomics function set enrichment analysis
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: person("Barry", "Song", email = "384220729@qq.com", role = c("aut", "cre"))
 Description: An R package for metabolomics function set enrichment analysis with 
     three statistical methods and multiple function sets.
