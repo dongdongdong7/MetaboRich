@@ -1,15 +1,46 @@
-data("setsList")
-swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.9)
-uniprot_id <- swiss_protein$id
-GO_tibble <- UNIPROT2GO(uniprot_id = uniprot_id)
-swiss_GO <- setsList_protein2setsList_GO(swiss_protein)
-hmdb_GO <- setsList_protein2setsList_GO(setsList_protein = setsList$hmdb_protein)
+# Create swiss_GO and hmdb_GO
+# data("setsList")
+# swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.9)
+# uniprot_id <- swiss_protein$id
+# GO_tibble <- UNIPROT2GO(uniprot_id = uniprot_id)
+# swiss_GO <- setsList_protein2setsList_GO(swiss_protein)
+# hmdb_GO <- setsList_protein2setsList_GO(setsList_protein = setsList$hmdb_protein)
+# setsList$swiss_GO <- swiss_GO
+# setsList$hmdb_GO <- hmdb_GO
+
 
 data("example_data")
 data("metabolitesList")
 example_data <- id_mapping(example_data, from = "kegg_id", "hmdb_id", metabolites_tibble = metabolitesList$hmdb)
-enrichmentRes_kstest <- kstest(input = example_data, enrich_tibble = hmdb_GO, adjust = "fdr", thread = 8)
-enrichmentRes_kstest <- enrichmentRes_kstest %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)
+swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.1)
+swiss_GO <- setsList_protein2setsList_GO(swiss_protein)
+enrichmentRes_kstest_swiss1 <- kstest(input = example_data, enrich_tibble = swiss_GO, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_swiss1 <- enrichmentRes_kstest %>% dplyr::filter(qvalue < 0.05) %>% dplyr::arrange(qvalue)
+openxlsx::write.xlsx(enrichmentRes_kstest_swiss1, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_swiss1.xlsx")
+enrichmentRes_kstest_hmdb1 <- kstest(input = example_data, enrich_tibble = setsList$hmdb_GO, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_hmdb1 <- enrichmentRes_kstest_hmdb1 %>% dplyr::filter(qvalue < 0.01) %>% dplyr::arrange(qvalue)
+openxlsx::write.xlsx(enrichmentRes_kstest_hmdb1, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_hmdb1.xlsx")
+
+swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.1)
+enrichmentRes_kstest_swiss_protein <- kstest(input = example_data, enrich_tibble = swiss_protein, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_swiss_protein <- enrichmentRes_kstest_swiss_protein %>% dplyr::filter(qvalue < 0.05) %>% dplyr::arrange(pvalue)
+
+enrichmentRes_kstest_hmdb_protein <- kstest(input = example_data, enrich_tibble = setsList$hmdb_protein, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_hmdb_protein <- enrichmentRes_kstest_hmdb_protein %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)
+
+enrichGO_swiss_protein <- clusterProfiler::enrichGO(gene = enrichmentRes_kstest_swiss_protein$id,
+                                                    OrgDb = org.Hs.eg.db::org.Hs.eg.db,
+                                                    keyType = "UNIPROT", ont = "ALL")
+write.csv(enrichGO_swiss_protein, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichGO_swiss_protein.csv")
+enrichGO_hmdb_protein <- clusterProfiler::enrichGO(gene = enrichmentRes_kstest_hmdb_protein$id,
+                                                   OrgDb = org.Hs.eg.db::org.Hs.eg.db,
+                                                   keyType = "UNIPROT",ont = "ALL")
+write.csv(enrichGO_hmdb_protein, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichGO_hmdb_protein.csv")
+
+swiss_GO[1, ]
+GO_tibble[which(GO_tibble$GO == "GO:0003331"), ]$UNIPROT
+setsList$swiss_protein[setsList$swiss_protein$id == "Q96IY4",]
+
 plot_enrichmentRes(enrichmentRes_kstest, top = 30, plot_type = 2)
 enrichmentRes_grsa <- grsa(input = example_data, enrich_tibble = hmdb_GO, adjust = "fdr", thread = 8)
 enrichmentRes_grsa <- enrichmentRes_grsa %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)

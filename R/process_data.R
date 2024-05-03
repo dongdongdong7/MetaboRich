@@ -79,7 +79,7 @@ setsList_protein2setsList_GO <- function(setsList_protein){
     if(is.na(GO_term)) next
     uniprot_tmp <- GO_tb_tmp$UNIPROT
     metabolites_tmp <- setsList_protein[setsList_protein$id == uniprot_tmp, ]$metabolites[[1]]
-    setsList_GO[which(setsList_GO$id == GO_term), ]$metabolites[[1]] <- c(setsList_GO[which(setsList_GO$id == GO_term), ]$metabolites[[1]], metabolites_tmp)
+    setsList_GO[which(setsList_GO$id == GO_term), ]$metabolites[[1]] <- unique(c(setsList_GO[which(setsList_GO$id == GO_term), ]$metabolites[[1]], metabolites_tmp))
   }
   goterms <- AnnotationDbi::Term(GO.db::GOTERM)
   goterms_tibble <- dplyr::tibble(term = names(goterms), description = as.vector(goterms))
