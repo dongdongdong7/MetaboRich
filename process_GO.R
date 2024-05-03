@@ -3,20 +3,28 @@
 # swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.9)
 # uniprot_id <- swiss_protein$id
 # GO_tibble <- UNIPROT2GO(uniprot_id = uniprot_id)
-# swiss_GO <- setsList_protein2setsList_GO(swiss_protein)
+# swiss_GO_0.9 <- setsList_protein2setsList_GO(swiss_protein)
+# swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.1)
+# uniprot_id <- swiss_protein$id
+# GO_tibble <- UNIPROT2GO(uniprot_id = uniprot_id)
+# swiss_GO_0.1 <- setsList_protein2setsList_GO(swiss_protein)
 # hmdb_GO <- setsList_protein2setsList_GO(setsList_protein = setsList$hmdb_protein)
-# setsList$swiss_GO <- swiss_GO
+# setsList$swiss_GO_0.9 <- swiss_GO_0.9
+# setsList$swiss_GO_0.1 <- swiss_GO_0.1
 # setsList$hmdb_GO <- hmdb_GO
 
-
+data("setsList")
 data("example_data")
 data("metabolitesList")
 example_data <- id_mapping(example_data, from = "kegg_id", "hmdb_id", metabolites_tibble = metabolitesList$hmdb)
-swiss_protein <- filter_swiss_protein(setsList$swiss_protein, probability = 0.1)
-swiss_GO <- setsList_protein2setsList_GO(swiss_protein)
-enrichmentRes_kstest_swiss1 <- kstest(input = example_data, enrich_tibble = swiss_GO, adjust = "fdr", thread = 8)
-enrichmentRes_kstest_swiss1 <- enrichmentRes_kstest %>% dplyr::filter(qvalue < 0.05) %>% dplyr::arrange(qvalue)
-openxlsx::write.xlsx(enrichmentRes_kstest_swiss1, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_swiss1.xlsx")
+
+enrichmentRes_kstest_swiss1_0.9 <- kstest(input = example_data, enrich_tibble = setsList$swiss_GO_0.9, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_swiss1_0.9 <- enrichmentRes_kstest_swiss1_0.9 %>% dplyr::filter(qvalue < 0.05) %>% dplyr::arrange(qvalue)
+openxlsx::write.xlsx(enrichmentRes_kstest_swiss1_0.9, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_swiss1_0.9.xlsx")
+enrichmentRes_kstest_swiss1_0.1 <- kstest(input = example_data, enrich_tibble = setsList$swiss_GO_0.1, adjust = "fdr", thread = 8)
+enrichmentRes_kstest_swiss1_0.1 <- enrichmentRes_kstest_swiss1_0.1 %>% dplyr::filter(qvalue < 0.05) %>% dplyr::arrange(qvalue)
+openxlsx::write.xlsx(enrichmentRes_kstest_swiss1_0.1, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_swiss1_0.1.xlsx")
+
 enrichmentRes_kstest_hmdb1 <- kstest(input = example_data, enrich_tibble = setsList$hmdb_GO, adjust = "fdr", thread = 8)
 enrichmentRes_kstest_hmdb1 <- enrichmentRes_kstest_hmdb1 %>% dplyr::filter(qvalue < 0.01) %>% dplyr::arrange(qvalue)
 openxlsx::write.xlsx(enrichmentRes_kstest_hmdb1, file = "D:/fudan/Projects/2024/meaWmrn/Progress/enrichGO/240503/enrichmentRes_kstest_hmdb1.xlsx")
@@ -45,3 +53,9 @@ plot_enrichmentRes(enrichmentRes_kstest, top = 30, plot_type = 2)
 enrichmentRes_grsa <- grsa(input = example_data, enrich_tibble = hmdb_GO, adjust = "fdr", thread = 8)
 enrichmentRes_grsa <- enrichmentRes_grsa %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)
 plot_compareRes(list(kstest = enrichmentRes_kstest, grsa = enrichmentRes_grsa), top = 30, plot_type = 2)
+
+# 我们需要看一下IDSL.GOA的对比和GO tree, 是不是要把他们都结合起来
+# IDSL.GOA
+goa_data <- read.table("D:/fudan/Projects/2024/meaWmrn/Progress/database/IDSL.GOA/library/go_to_inchikey14_links.txt", sep = "\t")
+length(unique(goa_data$V1)) # 2393
+
