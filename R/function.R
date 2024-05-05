@@ -78,13 +78,19 @@ ora <- function(input, enrich_tibble, enrich_type = "all", N_type = "measure", a
   if(enrich_type == "all") differential_data <- data %>% dplyr::filter(direction != "no change")
   else if(enrich_type == "up") differential_data <- data %>% dplyr::filter(direction == "up")
   else if(enrich_type == "down") differential_data <- data %>% dplyr::filter(direction == "down")
-  n <- nrow(differential_data)
   enrich_tibble <- enrich_tibble[which(purrr::map_int(enrich_tibble$metabolites, function(x) length(x)) != 0), ] # 去除metabolites长度为0的行
   sets_mets <- unique(purrr::list_c(enrich_tibble$metabolites))
   background_mets <- intersect(data$id, sets_mets)
-  if(N_type == "measure") N <- length(background_mets)
-  else if(N_type == "database") N <- length(sets_mets)
+  if(N_type == "measure"){
+    N <- length(background_mets)
+    differential_data <- differential_data[differential_data$id %in% background_mets, ]
+  }
+  else if(N_type == "database"){
+    N <- length(sets_mets)
+    differential_data <- differential_data[differential_data$id %in% sets_mets, ]
+  }
   else stop("N_type is wrong! {measure, database}")
+  n <- nrow(differential_data)
   metabolitesRatio <- paste0(round((length(background_mets) / nrow(data)) * 100, 2), "%")
   message(paste0("metabolitesRatio: ", metabolitesRatio))
   sets_number <- nrow(enrich_tibble)

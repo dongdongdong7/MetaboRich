@@ -15,6 +15,9 @@
 data("setsList")
 data("example_data")
 data("metabolitesList")
+data("predicted_GO")
+data("idsl_GO")
+data("hmdb_GO")
 example_data <- id_mapping(example_data, from = "kegg_id", "hmdb_id", metabolites_tibble = metabolitesList$hmdb)
 
 enrichmentRes_kstest_swiss1_0.9 <- kstest(input = example_data, enrich_tibble = setsList$swiss_GO_0.9, adjust = "fdr", thread = 8)
@@ -53,3 +56,6 @@ enrichmentRes_grsa <- grsa(input = example_data, enrich_tibble = hmdb_GO, adjust
 enrichmentRes_grsa <- enrichmentRes_grsa %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)
 plot_compareRes(list(kstest = enrichmentRes_kstest, grsa = enrichmentRes_grsa), top = 30, plot_type = 2)
 
+enrichmentRes_ora <- ora(example_data, enrich_tibble = hmdb_GO, N_type = "measure", thread = 8)
+enrichmentRes_ora <- enrichmentRes_ora %>% dplyr::filter(pvalue < 0.05) %>% dplyr::arrange(pvalue)
+plot_enrichmentRes(enrichmentRes_ora, plot_type = 2, top = 20)

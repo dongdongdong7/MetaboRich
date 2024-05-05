@@ -73,4 +73,4 @@ idsl_GO <- rbind(idsl_GO1, idsl_GO2)
 colnames(idsl_GO) <- c("id", "name", "type", "metabolites", "evidence")
 idsl_GO <- idsl_GO %>% dplyr::arrange(id)
 
-usethis::use_data(idsl_GO)
+#usethis::use_data(idsl_GO)
