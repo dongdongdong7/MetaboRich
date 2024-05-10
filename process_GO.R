@@ -22,6 +22,7 @@ data("metabolitesList")
 data("predicted_GO")
 data("idsl_GO")
 data("hmdb_GO")
+data("all_GO")
 data("predicted_GO_0.1")
 devtools::document()
 
