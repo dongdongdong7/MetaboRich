@@ -76,7 +76,7 @@ plot_enrichmentRes <- function(enrichmentRes, top = 10, plot_type = 1, legend.po
 plot_compareRes <- function(enrichmentResList, top = 15, plot_type = 1){
   resNum <- length(enrichmentResList)
   for(i in 1:resNum){
-    if(nrow(enrichmentResList[[i]]) < top) top_tmp <- length(enrichmentResList[[i]])
+    if(nrow(enrichmentResList[[i]]) < top) top_tmp <- nrow(enrichmentResList[[i]])
     else top_tmp <- top
     enrichmentResList[[i]] <- enrichmentResList[[i]] %>% dplyr::arrange(pvalue)
     enrichmentResList[[i]] <- enrichmentResList[[i]][1:top_tmp,]
