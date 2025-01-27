@@ -16,7 +16,7 @@
 #' plot_enrichmentRes(enrichmentRes = enrichmentRes_ora, plot_type = 1)
 #' plot_enrichmentRes(enrichmentRes = enrichmentRes_ora, plot_type = 2)
 #' plot_enrichmentRes(enrichmentRes = enrichmentRes_ora, plot_type = 3)
-plot_enrichmentRes <- function(enrichmentRes, top = 10, plot_type = 1, legend.position = "none"){
+plot_enrichmentRes <- function(enrichmentRes, top = 10, plot_type = 1, legend.position = "right"){
   enrichmentRes <- enrichmentRes %>%
     dplyr::arrange(pvalue)
   if(top > nrow(enrichmentRes)) top <- nrow(enrichmentRes)
@@ -44,6 +44,7 @@ plot_enrichmentRes <- function(enrichmentRes, top = 10, plot_type = 1, legend.po
       ggplot2::theme(legend.position = legend.position)
   }else if(plot_type == 3){
     enrichmentRes <- enrichmentRes %>% dplyr::mutate(richfc = inset / set)
+    enrichmentRes$name <- factor(enrichmentRes$name, levels = rev(levels(enrichmentRes$name)))
     p <- ggplot2::ggplot(enrichmentRes) +
       ggplot2::geom_point(ggplot2::aes(x = richfc, y = name, size = inset, color = pvalue)) +
       ggplot2::scale_color_gradient(low = "red", high = "blue") +
@@ -75,7 +76,7 @@ plot_enrichmentRes <- function(enrichmentRes, top = 10, plot_type = 1, legend.po
 plot_compareRes <- function(enrichmentResList, top = 15, plot_type = 1){
   resNum <- length(enrichmentResList)
   for(i in 1:resNum){
-    if(nrow(enrichmentResList[[i]]) < top) top_tmp <- length(enrichmentResList[[i]])
+    if(nrow(enrichmentResList[[i]]) < top) top_tmp <- nrow(enrichmentResList[[i]])
     else top_tmp <- top
     enrichmentResList[[i]] <- enrichmentResList[[i]] %>% dplyr::arrange(pvalue)
     enrichmentResList[[i]] <- enrichmentResList[[i]][1:top_tmp,]

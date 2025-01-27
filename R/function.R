@@ -18,10 +18,14 @@
 #' example_data <- id_mapping(input = example_data, from = "kegg_id", to = "hmdb_id", metabolites_tibble = metabolitesList$hmdb)
 id_mapping <- function(input, from = "kegg_id", to = "hmdb_id", metabolites_tibble){
   input <- dplyr::as_tibble(input)
+  n_start <- nrow(input)
   input <- dplyr::left_join(input, metabolites_tibble, by = c("id" = from))
   input <- input[, c(to, "logfc", "pvalue", "qvalue")]
   colnames(input)[1] <- "id"
   input <- input %>% dplyr::filter(!is.na(id))
+  n_end <- nrow(input)
+  mappingRatio <- paste0(round((n_end / n_start) * 100, 2), "%")
+  message(paste0("mappingRatio: ", mappingRatio))
   return(input)
 }
 
@@ -74,13 +78,19 @@ ora <- function(input, enrich_tibble, enrich_type = "all", N_type = "measure", a
   if(enrich_type == "all") differential_data <- data %>% dplyr::filter(direction != "no change")
   else if(enrich_type == "up") differential_data <- data %>% dplyr::filter(direction == "up")
   else if(enrich_type == "down") differential_data <- data %>% dplyr::filter(direction == "down")
-  n <- nrow(differential_data)
   enrich_tibble <- enrich_tibble[which(purrr::map_int(enrich_tibble$metabolites, function(x) length(x)) != 0), ] # 去除metabolites长度为0的行
   sets_mets <- unique(purrr::list_c(enrich_tibble$metabolites))
   background_mets <- intersect(data$id, sets_mets)
-  if(N_type == "measure") N <- length(background_mets)
-  else if(N_type == "database") N <- length(sets_mets)
+  if(N_type == "measure"){
+    N <- length(background_mets)
+    differential_data <- differential_data[differential_data$id %in% background_mets, ]
+  }
+  else if(N_type == "database"){
+    N <- length(sets_mets)
+    differential_data <- differential_data[differential_data$id %in% sets_mets, ]
+  }
   else stop("N_type is wrong! {measure, database}")
+  n <- nrow(differential_data)
   metabolitesRatio <- paste0(round((length(background_mets) / nrow(data)) * 100, 2), "%")
   message(paste0("metabolitesRatio: ", metabolitesRatio))
   sets_number <- nrow(enrich_tibble)
